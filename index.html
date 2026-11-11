@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ffcce0">
+    <meta name="description" content="点一下，下一场浪漫的爱心雨。">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="浪漫爱心雨">
+    <meta property="og:description" content="点一下，下一场浪漫的爱心雨。">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4b91' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E">
+    <title>浪漫爱心雨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            height: 100dvh; /* 适配手机动态视口 */
+            background: linear-gradient(135deg, #ffe6f0 0%, #ffcce0 100%);
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 页面背景光晕装饰 */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: -30% -20%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 182, 213, 0.4) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 按钮样式 */
+        #openBtn {
+            position: relative;
+            z-index: 10;
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #ff5c9e, #ff3377);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255, 75, 145, 0.45);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #openBtn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 30px rgba(255, 75, 145, 0.55);
+        }
+
+        #openBtn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* 爱心雨全屏容器 */
+        .rain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 让点击穿透到按钮 */
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        /* 真正的 SVG 爱心 */
+        .heart-svg {
+            position: absolute;
+            top: -10vh; /* 从屏幕上方外部开始 */
+            /* 尺寸和位置由 JS 动态设置 */
+            animation-name: fallAndSway;
+            animation-timing-function: linear;
+            animation-iteration-count: 1;
+            animation-fill-mode: forwards;
+            will-change: transform, opacity;
+            /* 轻微的发光效果，采用动态颜色稍后会由 JS 附加 */
+        }
+
+        /* 下落并左右飘动的动画 */
+        @keyframes fallAndSway {
+            0% {
+                /* 初始位置：上方外，无旋转 */
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                /* 刚开始下落，淡入 */
+                opacity: var(--opacity);
+            }
+            50% {
+                /* 飘到一半，水平方向偏到一侧 */
+                transform: translateY(55vh) translateX(var(--sway)) rotate(var(--rot));
+            }
+            90% {
+                /* 快要落底 */
+                opacity: var(--opacity);
+            }
+            100% {
+                /* 完全落出屏幕，再水平偏移一些 */
+                transform: translateY(110vh) translateX(calc(var(--sway) * -1)) rotate(calc(var(--rot) * 1.5));
+                opacity: 0;
+            }
+        }
+
+        /* 触屏设备优化 */
+        @media (hover: none) {
+            #openBtn:hover {
+                transform: none;
+                box-shadow: 0 8px 24px rgba(255, 75, 145, 0.45);
+            }
+            #openBtn:active {
+                transform: scale(0.96);
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="openBtn">点击下起爱心雨 💕</button>
+
+    <!-- 爱心雨容器 -->
+    <div class="rain-container" id="rainContainer"></div>
+
+    <script>
+        (function() {
+            const openBtn = document.getElementById('openBtn');
+            const rainContainer = document.getElementById('rainContainer');
+
+            // 生成随机数
+            function random(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            // 随机爱心颜色
+            function randomHeartColor() {
+                const colors = [
+                    '#ff3366', '#ff4b91', '#ff6b9d', '#ff8cb0',
+                    '#ff5c8a', '#ff2d55', '#ff7799', '#ff99bb',
+                    '#e8436e', '#d6336c', '#ff4081', '#f06292',
+                    '#ec407a', '#ff80ab', '#ff9eb5', '#ffb3c6'
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            // 生成 SVG 爱心元素
+            function createHeart() {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'heart-svg';
+
+                // 随机属性
+                const size = random(16, 36); // 爱心尺寸 16px ~ 36px
+                const left = random(0, 100); // 屏幕水平位置
+                const sway = random(-80, 80); // 水平左右飘动幅度 (px)
+                const rot = random(60, 240); // 旋转角度
+                const duration = random(3.5, 7); // 下落持续时间 (秒)
+                const delay = random(0, 2); // 随机延迟 (秒)
+                const opacity = random(0.7, 1); // 随机透明度
+                const color = randomHeartColor();
+
+                // SVG 爱心路径数据
+                const heartPath = "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z";
+
+                // 构建 SVG 结构
+                wrapper.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="${color}" style="filter: drop-shadow(0 2px 6px ${color}80);">
+                        <path d="${heartPath}"/>
+                    </svg>
+                `;
+
+                // 设置元素尺寸
+                wrapper.style.width = size + 'px';
+                wrapper.style.height = size + 'px';
+                wrapper.style.left = left + '%';
+
+                // 将自定义属性传给 CSS
+                wrapper.style.setProperty('--sway', sway + 'px');
+                wrapper.style.setProperty('--rot', rot + 'deg');
+                wrapper.style.setProperty('--opacity', opacity);
+                
+                // 动画时长和延迟
+                wrapper.style.animationDuration = duration + 's';
+                wrapper.style.animationDelay = delay + 's';
+
+                return wrapper;
+            }
+
+            // 触发爱心雨
+            function startHeartRain() {
+                // 清空之前可能残留的爱心
+                rainContainer.innerHTML = '';
+
+                // 根据屏幕宽度决定生成数量（手机端少一些，避免卡顿）
+                const width = window.innerWidth;
+                let count = 80; // 默认
+                if (width < 480) {
+                    count = 50; 
+                } else if (width < 768) {
+                    count = 70;
+                } else {
+                    count = 100;
+                }
+
+                // 生成并添加爱心
+                for (let i = 0; i < count; i++) {
+                    const heart = createHeart();
+                    rainContainer.appendChild(heart);
+                }
+
+                // 定时清理 DOM，防止节点过多
+                if (window.cleanupTimeout) {
+                    clearTimeout(window.cleanupTimeout);
+                }
+                // 10秒后清理（最长 7s 动画 + 2s 延迟 + 1s 缓冲）
+                window.cleanupTimeout = setTimeout(() => {
+                    rainContainer.innerHTML = '';
+                }, 10000);
+            }
+
+            // 绑定点击事件
+            openBtn.addEventListener('click', function() {
+                startHeartRain();
+            });
+
+            // 移动端防双击缩放
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+
+        })();
+    </script>
+</body>
+</html>
