@@ -480,6 +480,7 @@
   body.is-secret .cta-glow{background:rgba(255,171,84,.25);}
   body.is-secret .cursor-glow{background:radial-gradient(circle,rgba(255,191,110,.1),rgba(255,191,110,.025) 42%,transparent 68%);}
   body.is-secret .heart-beat{filter:sepia(.62) saturate(1.5) hue-rotate(-10deg) brightness(1.06);}
+  body.is-secret .sat{filter:sepia(.6) saturate(1.4) hue-rotate(-14deg) brightness(1.08) drop-shadow(0 0 12px rgba(255,190,120,.5));}
   body.is-secret .brand em{color:rgba(255,239,211,.88);}
 
   @keyframes heroLine{
@@ -623,7 +624,19 @@
     animation:ringSpin 32s linear infinite;
   }
   .ring-c{width:97%;height:97%;border-color:rgba(255,255,255,.035);}
+  .ring-arc{
+    width:92%;height:92%;
+    border:0;
+    background:conic-gradient(from 0deg,transparent 0 32%,rgba(255,198,216,.48) 44%,rgba(255,246,236,.22) 49%,transparent 58% 100%);
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.2px));
+    mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.2px));
+    transform:rotateX(66deg) rotateZ(-22deg);
+    animation:arcSpin 17s linear infinite;
+    opacity:.72;
+    filter:drop-shadow(0 0 9px rgba(255,145,180,.42));
+  }
   @keyframes ringSpin{to{transform:rotateX(62deg) rotateZ(384deg);}}
+  @keyframes arcSpin{to{transform:rotateX(66deg) rotateZ(338deg);}}
   @keyframes haloPulse{
     0%,100%{opacity:.62;transform:scale(.94);}
     50%{opacity:1;transform:scale(1.05);}
@@ -659,6 +672,81 @@
   @keyframes sparkle{
     0%,100%{opacity:.18;transform:scale(.7) rotate(0deg);}
     50%{opacity:1;transform:scale(1.15) rotate(18deg);}
+  }
+
+  .mini-defs{
+    position:absolute;
+    width:0;height:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .heart-web{
+    position:absolute;
+    inset:-2%;
+    z-index:0;
+    width:104%;height:104%;
+    overflow:visible;
+    pointer-events:none;
+    opacity:.78;
+  }
+  .heart-web .web-line{
+    fill:none;
+    stroke:rgba(255,196,218,.28);
+    stroke-width:.9;
+    stroke-dasharray:2 8;
+    animation:webShift 24s linear infinite;
+  }
+  .heart-web .web-star{
+    fill:rgba(255,228,238,.72);
+    filter:drop-shadow(0 0 4px rgba(255,155,190,.95));
+  }
+  @keyframes webShift{to{stroke-dashoffset:-100;}}
+
+  .satellite-field{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+  }
+  .sat{
+    position:absolute;
+    width:var(--s);
+    height:calc(var(--s) * .92);
+    color:var(--c);
+    opacity:0;
+    transform:scale(.35);
+    filter:drop-shadow(0 0 11px var(--glow));
+    will-change:transform,opacity;
+  }
+  .overlay.is-open .sat{animation:satIn .85s var(--ease) var(--in,0s) both;}
+  .sat-inner{
+    display:block;
+    width:100%;height:100%;
+    transform-origin:50% 50%;
+    animation:satFloat var(--t,6.4s) ease-in-out var(--d,0s) infinite;
+  }
+  .sat svg{display:block;width:100%;height:100%;overflow:visible;}
+  .sat.s1{left:-1%;top:15%;--s:42px;--c:#FF9FBC;--glow:rgba(255,105,155,.42);--r:-18deg;--t:6.1s;--d:-.7s;--in:.48s;}
+  .sat.s2{left:16%;top:-1%;--s:26px;--c:#FFD1A8;--glow:rgba(255,190,135,.36);--r:14deg;--t:7.2s;--d:-2.3s;--in:.58s;}
+  .sat.s3{right:-1%;top:12%;--s:36px;--c:#D8B9FF;--glow:rgba(190,145,255,.38);--r:20deg;--t:6.7s;--d:-1.4s;--in:.66s;}
+  .sat.s4{right:3%;top:40%;--s:22px;--c:#FFE2A8;--glow:rgba(255,210,145,.34);--r:-10deg;--t:8.1s;--d:-3.1s;--in:.74s;}
+  .sat.s5{left:-1%;bottom:24%;--s:30px;--c:#FF8FAE;--glow:rgba(255,100,150,.4);--r:9deg;--t:5.8s;--d:-2.8s;--in:.82s;}
+  .sat.s6{right:-1%;bottom:15%;--s:46px;--c:#C7B8FF;--glow:rgba(175,150,255,.36);--r:-21deg;--t:7.6s;--d:-.3s;--in:.9s;}
+  .sat.s7{left:17%;bottom:5%;--s:20px;--c:#FFC6D6;--glow:rgba(255,150,180,.34);--r:16deg;--t:8.6s;--d:-3.8s;--in:.98s;}
+  .sat.s8{left:36%;top:-3%;--s:18px;--c:#FFE6C2;--glow:rgba(255,215,160,.3);--r:24deg;--t:7.9s;--d:-4.4s;--in:1.06s;}
+  @keyframes satIn{
+    0%{opacity:0;transform:scale(.32) translateY(12px);}
+    62%{opacity:1;transform:scale(1.08) translateY(-2px);}
+    100%{opacity:1;transform:scale(1) translateY(0);}
+  }
+  @keyframes satFloat{
+    0%,100%{transform:translate3d(0,2px,0) rotate(var(--r,0deg)) scale(.96);}
+    50%{transform:translate3d(0,-11px,0) rotate(calc(var(--r,0deg) + 6deg)) scale(1.05);}
+  }
+  .scene.is-poked .sat-inner{animation:satCheer .72s var(--ease) both;}
+  @keyframes satCheer{
+    0%,100%{transform:translate3d(0,0,0) scale(1) rotate(var(--r,0deg));}
+    42%{transform:translate3d(0,-13px,0) scale(1.2) rotate(calc(var(--r,0deg) + 13deg));}
   }
 
   .heart-enter{
@@ -979,9 +1067,9 @@
       <span class="line"><span class="accent">心动<span class="accent-spark">✦</span></span>一下。</span>
     </h1>
     <p class="lede">
-      有一个小小的惊喜，藏在按钮后面。<br>
-      <span class="soft">它有点害羞，会悄悄躲开你的鼠标。</span><br>
-      <span class="tiny">也别太温柔，它可能会假装没听见。</span>
+      有一整片小小的星域，藏在按钮后面。<br>
+      <span class="soft">它们有点害羞，会悄悄躲开你的鼠标。</span><br>
+      <span class="tiny">也别太温柔，它们可能会假装没听见。</span>
     </p>
 
     <div class="cta-wrap">
@@ -993,7 +1081,7 @@
             <path d="M7.4 5.4C6.2 5.8 5.5 6.6 5.3 7.7" stroke="#FFD4DF" stroke-width="1.1" stroke-linecap="round"/>
           </svg>
         </span>
-        <span class="cta-label" id="ctaLabel">点我，出现惊喜</span>
+        <span class="cta-label" id="ctaLabel">点我，放出一整片心动</span>
         <span class="cta-shine" aria-hidden="true"></span>
       </button>
       <p class="cta-hint">an unpredictable button<span class="dot"></span>handle with care</p>
@@ -1017,11 +1105,36 @@
 
   <div class="popup-shell" id="popupShell" tabindex="-1">
     <div class="scene">
+      <svg class="mini-defs" aria-hidden="true" focusable="false">
+        <defs>
+          <symbol id="miniHeart" viewBox="0 0 100 92">
+            <path d="M50 86C42 79 8 55 8 31C8 15 20 5 34 5C43 5 48 10 50 16C52 10 57 5 66 5C80 5 92 15 92 31C92 55 58 79 50 86Z" fill="currentColor"/>
+            <ellipse cx="35" cy="25" rx="9.5" ry="5" transform="rotate(-28 35 25)" fill="#FFF" opacity=".3"/>
+            <path d="M32 14C23 15 17 21 16 30" stroke="#FFF" stroke-width="3.2" stroke-linecap="round" opacity=".58"/>
+            <path d="M50 86C42 79 8 55 8 31C8 15 20 5 34 5C43 5 48 10 50 16C52 10 57 5 66 5C80 5 92 15 92 31C92 55 58 79 50 86Z" fill="none" stroke="#FFF" stroke-opacity=".26" stroke-width="1.2"/>
+          </symbol>
+        </defs>
+      </svg>
+      <svg class="heart-web" viewBox="0 0 360 360" preserveAspectRatio="none" aria-hidden="true">
+        <path class="web-line" d="M180 330C136 296 35 216 35 121C35 70 74 34 119 34C149 34 170 51 180 74C190 51 211 34 241 34C286 34 325 70 325 121C325 216 224 296 180 330Z"/>
+        <path class="web-line" d="M35 121L180 34L325 121M119 34L180 330L241 34" opacity=".52"/>
+        <g class="web-star">
+          <circle cx="119" cy="34" r="1.4"/>
+          <circle cx="180" cy="34" r="1.1"/>
+          <circle cx="241" cy="34" r="1.4"/>
+          <circle cx="35" cy="121" r="1.2"/>
+          <circle cx="325" cy="121" r="1.2"/>
+          <circle cx="180" cy="330" r="1.3"/>
+          <circle cx="90" cy="226" r=".9"/>
+          <circle cx="272" cy="226" r=".9"/>
+        </g>
+      </svg>
       <div class="halo" aria-hidden="true"></div>
       <div class="halo halo-2" aria-hidden="true"></div>
       <div class="ring ring-a" aria-hidden="true"></div>
       <div class="ring ring-b" aria-hidden="true"></div>
       <div class="ring ring-c" aria-hidden="true"></div>
+      <div class="ring ring-arc" aria-hidden="true"></div>
       <span class="orbit-heart h1" aria-hidden="true">♥</span>
       <span class="orbit-heart h2" aria-hidden="true">♥</span>
       <span class="orbit-heart h3" aria-hidden="true">♥</span>
@@ -1031,7 +1144,18 @@
       <span class="spark s3" aria-hidden="true">✦</span>
       <span class="spark s4" aria-hidden="true">✦</span>
 
-      <div class="heart-enter" id="heartEnter" role="button" tabindex="0" aria-label="戳一下心跳，再撒一些爱心">
+      <div class="satellite-field" aria-hidden="true">
+        <span class="sat s1"><span class="sat-inner"><svg viewBox="0 0 100 92"><use href="#miniHeart"/></svg></span></span>
+        <span class="sat s2"><span class="sat-inner"><svg viewBox="0 0 100 92"><use href="#miniHeart"/></svg></span></span>
+        <span class="sat s3"><span class="sat-inner"><svg viewBox="0 0 100 92"><use href="#miniHeart"/></svg></span></span>
+        <span class="sat s4"><span class="sat-inner"><svg viewBox="0 0 100 92"><use href="#miniHeart"/></svg></span></span>
+        <span class="sat s5"><span class="sat-inner"><svg viewBox="0 0 100 92"><use href="#miniHeart"/></svg></span></span>
+        <span class="sat s6"><span class="sat-inner"><svg viewBox="0 0 100 92"><use href="#miniHeart"/></svg></span></span>
+        <span class="sat s7"><span class="sat-inner"><svg viewBox="0 0 100 92"><use href="#miniHeart"/></svg></span></span>
+        <span class="sat s8"><span class="sat-inner"><svg viewBox="0 0 100 92"><use href="#miniHeart"/></svg></span></span>
+      </div>
+
+      <div class="heart-enter" id="heartEnter" role="button" tabindex="0" aria-label="戳一下心跳，让整片星域亮起来">
         <div class="heart-float">
           <div class="heart-tilt" id="heartTilt">
           <div class="heart-beat">
@@ -1160,7 +1284,7 @@
 
 <div class="secret-toast" id="secretToast" role="status" aria-live="polite">
   <span class="toast-mark" aria-hidden="true">♥</span>
-  <span><b>秘密解锁</b> · 这颗心，是留给你的。</span>
+  <span><b>秘密解锁</b> · 这一整片心动，都是你的。</span>
 </div>
 
 <script>
@@ -1198,29 +1322,29 @@
 
   const copy = [
     {
-      kicker: 'First flutter',
-      title: '<span class="tm">咚</span>，<span class="grad">心动抵达</span>。',
-      message: '这一刻，宇宙替你按下了暂停键。<br>嘘——先别急着走。'
+      kicker: 'First galaxy',
+      title: '心动，<span class="grad">不止一颗</span>。',
+      message: '这一整片星域，都在替你心动。<br>慢慢看，它们不会走。'
     },
     {
       kicker: 'Second flutter',
-      title: '又<span class="grad">听见</span>了吗？',
-      message: '原来惊喜，也是有声音的。<br>它在你心里，轻轻敲了两下。'
+      title: '又<span class="grad">亮起</span>一颗。',
+      message: '每靠近一点，就多一颗心亮起来。<br>原来心动，是会传染的。'
     },
     {
       kicker: 'Third flutter',
-      title: '<span class="tm">被</span>你<span class="grad">发现了</span>。',
-      message: '秘密是：这颗心，只想被你一个人点开。<br>现在，它归你了。'
+      title: '你<span class="grad">点亮</span>了整片星海。',
+      message: '秘密是：这里每一颗心，都朝着你。<br>现在，它们都归你了。'
     },
     {
       kicker: 'Encore',
       title: '心动，<span class="grad">不限次数</span>。',
-      message: '既然来了，就多停留一秒吧。<br>反正这颗心，跑不掉。'
+      message: '既然来了，就多停留一秒吧。<br>反正这一整片心，都跑不掉。'
     }
   ];
 
   const ctaCopy = [
-    '点我，出现惊喜',
+    '点我，放出一整片心动',
     '再点一次试试',
     '真的还要点？',
     '好吧，再心动一次'
@@ -1670,6 +1794,11 @@
     if (!isOpen) return;
     const c = heartCenter();
     spawnBurst(c.x, c.y, 34, 0.9);
+    const scene = heartEnter.closest('.scene');
+    scene.classList.remove('is-poked');
+    void scene.offsetWidth;
+    scene.classList.add('is-poked');
+    window.setTimeout(() => scene.classList.remove('is-poked'), 760);
     heartEnter.animate(
       [
         { transform: 'scale(1)' },
